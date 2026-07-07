@@ -36,7 +36,7 @@ def chat():
 
         # 1. توجيه الطلب إلى Google Gemini
         if provider == "gemini":
-            model = genai.GenerativeModel('gemini-1.5-flash', system_instruction=SYSTEM_INSTRUCTION)
+            model = genai.GenerativeModel('gemini-2.5-flash', system_instruction=SYSTEM_INSTRUCTION)
             response = model.generate_content(user_message)
             reply = response.text
 
