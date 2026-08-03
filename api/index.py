@@ -44,7 +44,7 @@ def chat():
 
         reply = ""
 
-        # 1. توجيه الطلب إلى Google Gemini (يدعم السجل والصور معاً)
+        # 1. توجيه الطلب إلى Google Gemini (يدعم السجل والصور معاً وبشكل آمن)
         if provider == "gemini":
             model = genai.GenerativeModel('gemini-1.5-flash', system_instruction=SYSTEM_INSTRUCTION)
             
@@ -55,25 +55,28 @@ def chat():
                 role = msg.get('role')
                 content = msg.get('content', '')
                 
-                # توحيد الأدوار لتتوافق مع متطلبات جمني ('user' أو 'model')
-                gemini_role = 'user' if role in ['user', 'system'] else 'model'
+                # تحويل الأدوار حصراً إلى 'user' أو 'model'
+                gemini_role = 'user' if role == 'user' else 'model'
                 
                 if i == len(messages) - 1:
                     latest_message_content = content
                 else:
                     gemini_history.append({
                         'role': gemini_role,
-                        'parts': [content]
+                        'parts': [str(content)]
                     })
 
-            # تجهيز محتوى الرسالة الأخيرة مع إرفاق الصورة إن وجدت
-            last_parts = [latest_message_content]
+            # تجهيز محتوى الرسالة الأخيرة مع إرفاق الصورة إن وجدت بأمان
+            last_parts = [str(latest_message_content)]
             if base64_image:
-                image_parts = {
-                    'mime_type': 'image/jpeg',
-                    'data': base64.b64decode(base64_image)
-                }
-                last_parts.append(image_parts)
+                try:
+                    image_parts = {
+                        'mime_type': 'image/jpeg',
+                        'data': base64.b64decode(base64_image)
+                    }
+                    last_parts.append(image_parts)
+                except Exception as img_err:
+                    print(f"Image decode error: {img_err}")
 
             chat_session = model.start_chat(history=gemini_history)
             response = chat_session.send_message(last_parts)
