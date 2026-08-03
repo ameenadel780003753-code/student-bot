@@ -1,4 +1,3 @@
-
 import os
 import google.generativeai as genai
 from flask import Flask, jsonify, request
@@ -7,7 +6,6 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-# تهيئة مفتاح API الخاص بـ Gemini من متغيرات البيئة
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 if GEMINI_API_KEY:
   genai.configure(api_key=GEMINI_API_KEY)
@@ -50,6 +48,11 @@ def chat():
 
   except Exception as e:
     return jsonify({"error": str(e)}), 500
+
+
+@app.route("/favicon.ico", methods=["GET"])
+def favicon():
+  return "", 204
 
 
 @app.route("/", methods=["GET"])
